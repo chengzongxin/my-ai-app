@@ -87,21 +87,21 @@ const ChatInterface = () => {
                 <ReactMarkdown
                   className="prose prose-sm max-w-none dark:prose-invert"
                   components={{
-                    h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-xl font-semibold my-3" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-lg font-medium my-2" {...props} />,
-                    p: ({node, ...props}) => <p className="my-2" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc list-inside my-2" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal list-inside my-2" {...props} />,
-                    li: ({node, ...props}) => <li className="my-1" {...props} />,
-                    a: ({node, ...props}) => <a className="text-blue-600 hover:underline" {...props} />,
-                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2" {...props} />,
-                    pre: ({ node, ...props }) => (
+                    h1: ({...props}) => <h1 className="text-2xl font-bold my-4" {...props} />,
+                    h2: ({...props}) => <h2 className="text-xl font-semibold my-3" {...props} />,
+                    h3: ({...props}) => <h3 className="text-lg font-medium my-2" {...props} />,
+                    p: ({...props}) => <p className="my-2" {...props} />,
+                    ul: ({...props}) => <ul className="list-disc list-inside my-2" {...props} />,
+                    ol: ({...props}) => <ol className="list-decimal list-inside my-2" {...props} />,
+                    li: ({...props}) => <li className="my-1" {...props} />,
+                    a: ({...props}) => <a className="text-blue-600 hover:underline" {...props} />,
+                    blockquote: ({...props}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2" {...props} />,
+                    pre: ({ ...props }) => (
                       <div className="overflow-auto my-2 bg-gray-800 p-2 rounded">
                         <pre {...props} className="text-gray-100" />
                       </div>
                     ),
-                    code: ({ node, inline, className, children, ...props }) => {
+                    code: ({ inline, className, children, ...props }) => {
                       const match = /language-(\w+)/.exec(className || '');
                       return !inline && match ? (
                         <code className={`${className} text-gray-100 block p-2`} {...props}>
