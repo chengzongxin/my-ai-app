@@ -1,18 +1,6 @@
 import React from 'react';
-import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Metadata } from 'next';
 import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: 'AI 助手 - 智能对话平台',
@@ -26,11 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className="max-w-7xl mx-auto px-4 w-full">{children}</body>
     </html>
   );
 }

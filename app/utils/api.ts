@@ -2,26 +2,35 @@ const DEEPSEEK_API_KEY = 'sk-4a93fe1df5ad4977823c4c8c775f3552';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 // 保留原始的 OpenAI 常量
-const OPENAI_API_KEY = 'your_openai_api_key_here'; // 请替换为您的 OpenAI API 密钥
+const OPENAI_API_KEY = 'your_openai_api_key_here';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 // 添加 GPT 中转服务的常量
 const GPT_PROXY_API_KEY = 'sk-HCTc2ukDHOH3DBqHjiARPDCcoLprFKGlaXT67zfNUC8hPZLW';
 const GPT_PROXY_API_URL = 'https://api.chatanywhere.tech/v1/chat/completions';
 
+// 添加 DeepBricks 中转服务的常量 https://www.bilibili.com/video/BV1nm42137jT?spm_id_from=333.788.recommend_more_video.1&vd_source=20eec788b9d1cec8ca6afbcdd638953f
+const DEEPBRICKS_API_KEY = 'sk-PNab5CAdTnzN4ekzLMrELcAfp2fqCsaI07OookD41rJo2sSG';
+const DEEPBRICKS_API_URL = 'https://api.deepbricks.ai/v1/chat/completions';
+
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export type ModelType = 'gpt-proxy' | 'openai' | 'deepseek';
+export type ModelType = 'deepbricks' | 'gpt-proxy' | 'openai' | 'deepseek';
 
-export async function sendMessage(messages: Message[], model: ModelType = 'gpt-proxy') {
+export async function sendMessage(messages: Message[], model: ModelType = 'deepbricks') {
   let apiUrl: string;
   let apiKey: string;
   let modelName: string;
 
   switch (model) {
+    case 'deepbricks':
+      apiUrl = DEEPBRICKS_API_URL;
+      apiKey = DEEPBRICKS_API_KEY;
+      modelName = 'gpt-4o'; // 或者您想使用的其他模型
+      break;
     case 'gpt-proxy':
       apiUrl = GPT_PROXY_API_URL;
       apiKey = GPT_PROXY_API_KEY;

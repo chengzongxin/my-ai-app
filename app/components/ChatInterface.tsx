@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { sendMessage, Message, ModelType } from '../utils/api';
 
 const allHotTopics = [
+  "你的AI模型是哪个版本",
   "介绍一下人工智能",
   "解释量子计算",
   "如何学习编程",
@@ -23,15 +24,16 @@ const allHotTopics = [
 ];
 
 const getRandomTopics = (count: number) => {
-  const shuffled = [...allHotTopics].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+  const firstTopic = allHotTopics[0]; // 始终包含第一个话题
+  const shuffled = [...allHotTopics.slice(1)].sort(() => 0.5 - Math.random());
+  return [firstTopic, ...shuffled.slice(0, count - 1)];
 };
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [model, setModel] = useState<ModelType>('gpt-proxy');
+  const [model, setModel] = useState<ModelType>('deepbricks');
   const [hotTopics, setHotTopics] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +108,7 @@ const ChatInterface = () => {
           onChange={handleModelChange}
           className="px-2 py-1 border rounded"
         >
+          <option value="deepbricks">DeepBricks 中转</option>
           <option value="gpt-proxy">GPT 中转 (免费)</option>
           <option value="openai">OpenAI</option>
           <option value="deepseek">DeepSeek</option>
