@@ -100,9 +100,9 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-4 border-b flex justify-between items-center">
-        <h2 className="text-lg font-semibold">热门话题：</h2>
+        <h2 className="text-lg font-semibold">AI 助手</h2>
         <select
           value={model}
           onChange={handleModelChange}
@@ -114,19 +114,24 @@ const ChatInterface = () => {
           <option value="deepseek">DeepSeek</option>
         </select>
       </div>
-      <div className="p-2 flex flex-wrap gap-2">
-        {hotTopics.map((topic, index) => (
-          <button
-            key={index}
-            onClick={() => handleTopicClick(topic)}
-            className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm"
-            disabled={isLoading}
-          >
-            {topic}
-          </button>
-        ))}
-      </div>
       <div className="h-[calc(100vh-300px)] p-4 overflow-y-auto">
+        {messages.length === 0 ? (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">热门话题：</h3>
+            <div className="flex flex-wrap gap-2">
+              {hotTopics.map((topic, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleTopicClick(topic)}
+                  className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm"
+                  disabled={isLoading}
+                >
+                  {topic}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         {messages.map((message, index) => (
           <div
             key={index}
