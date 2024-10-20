@@ -47,7 +47,7 @@ const ChatInterface = () => {
 
   const handleTopicClick = (topic: string) => {
     setInput(topic);
-    handleSubmit(new Event('submit') as React.FormEvent<HTMLFormElement>);
+    handleSubmit({ preventDefault: () => {} } as React.FormEvent<HTMLFormElement>);
   };
 
   return (
@@ -101,9 +101,9 @@ const ChatInterface = () => {
                         <pre {...props} className="text-gray-100" />
                       </div>
                     ),
-                    code: ({ inline, className, children, ...props }) => {
+                    code: ({ className, children, ...props }) => {
                       const match = /language-(\w+)/.exec(className || '');
-                      return !inline && match ? (
+                      return className && match ? (
                         <code className={`${className} text-gray-100 block p-2`} {...props}>
                           {children}
                         </code>
