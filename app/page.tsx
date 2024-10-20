@@ -1,6 +1,11 @@
 import React from 'react';
+import { Metadata } from 'next';
 import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
+
+export const metadata: Metadata = {
+  title: 'AI 助手 - 首页',
+};
 
 export default function Home() {
   return (

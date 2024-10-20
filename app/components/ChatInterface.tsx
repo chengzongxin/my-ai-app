@@ -2,21 +2,42 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { sendMessage, Message } from '../utils/api';
+import { sendMessage, Message, ModelType } from '../utils/api';
 
-const hotTopics = [
+const allHotTopics = [
   "介绍一下人工智能",
   "解释量子计算",
   "如何学习编程",
   "气候变化的影响",
-  "未来的工作趋势"
+  "未来的工作趋势",
+  "区块链技术的应用",
+  "太空探索的最新进展",
+  "5G技术对社会的影响",
+  "机器学习在医疗领域的应用",
+  "可再生能源的发展前景",
+  "虚拟现实技术的未来",
+  "自动驾驶汽车的挑战",
+  "基因编辑技术的伦理问题",
+  "大数据在商业决策中的作用",
+  "人工智能在艺术创作中的应用"
 ];
+
+const getRandomTopics = (count: number) => {
+  const shuffled = [...allHotTopics].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [model, setModel] = useState<ModelType>('gpt-proxy');
+  const [hotTopics, setHotTopics] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setHotTopics(getRandomTopics(5));
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,38 +54,74 @@ const ChatInterface = () => {
       setInput('');
 
       try {
-        const aiResponse = await sendMessage([...messages, userMessage]);
+        const aiResponse = await sendMessage([...messages, userMessage], model);
         const aiMessage: Message = { role: 'assistant', content: aiResponse };
         setMessages(prevMessages => [...prevMessages, aiMessage]);
       } catch (error) {
         console.error('Error sending message:', error);
-        // 可以在这里添加错误处理逻辑，比如显示一个错误消息给用户
+        const errorMessage: Message = { 
+          role: 'assistant', 
+          content: `发生错误: ${error instanceof Error ? error.message : '未知错误'}`
+        };
+        setMessages(prevMessages => [...prevMessages, errorMessage]);
       } finally {
         setIsLoading(false);
       }
     }
   };
 
-  const handleTopicClick = (topic: string) => {
-    setInput(topic);
-    handleSubmit({ preventDefault: () => {} } as React.FormEvent<HTMLFormElement>);
+  const handleTopicClick = async (topic: string) => {
+    if (!isLoading) {
+      setIsLoading(true);
+      const userMessage: Message = { role: 'user', content: topic };
+      setMessages(prevMessages => [...prevMessages, userMessage]);
+
+      try {
+        const aiResponse = await sendMessage([...messages, userMessage], model);
+        const aiMessage: Message = { role: 'assistant', content: aiResponse };
+        setMessages(prevMessages => [...prevMessages, aiMessage]);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        const errorMessage: Message = { 
+          role: 'assistant', 
+          content: `发生错误: ${error instanceof Error ? error.message : '未知错误'}`
+        };
+        setMessages(prevMessages => [...prevMessages, errorMessage]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setModel(e.target.value as ModelType);
   };
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold mb-2">热门话题：</h2>
-        <div className="flex flex-wrap gap-2">
-          {hotTopics.map((topic, index) => (
-            <button
-              key={index}
-              onClick={() => handleTopicClick(topic)}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm"
-            >
-              {topic}
-            </button>
-          ))}
-        </div>
+      <div className="p-4 border-b flex justify-between items-center">
+        <h2 className="text-lg font-semibold">热门话题：</h2>
+        <select
+          value={model}
+          onChange={handleModelChange}
+          className="px-2 py-1 border rounded"
+        >
+          <option value="gpt-proxy">GPT 中转 (免费)</option>
+          <option value="openai">OpenAI</option>
+          <option value="deepseek">DeepSeek</option>
+        </select>
+      </div>
+      <div className="p-2 flex flex-wrap gap-2">
+        {hotTopics.map((topic, index) => (
+          <button
+            key={index}
+            onClick={() => handleTopicClick(topic)}
+            className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm"
+            disabled={isLoading}
+          >
+            {topic}
+          </button>
+        ))}
       </div>
       <div className="h-[calc(100vh-300px)] p-4 overflow-y-auto">
         {messages.map((message, index) => (
