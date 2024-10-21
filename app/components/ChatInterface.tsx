@@ -56,9 +56,28 @@ const ChatInterface = () => {
       setInput('');
 
       try {
-        const aiResponse = await sendMessage([...messages, userMessage], model);
-        const aiMessage: Message = { role: 'assistant', content: aiResponse };
-        setMessages(prevMessages => [...prevMessages, aiMessage]);
+        if (model === 'deepbricks') {
+          const stream = await sendMessage([...messages, userMessage], model);
+          let fullResponse = '';
+          const aiMessage: Message = { role: 'assistant', content: '' };
+          setMessages(prevMessages => [...prevMessages, aiMessage]);
+
+          for await (const chunk of stream) {
+            fullResponse += chunk;
+            setMessages(prevMessages => {
+              const newMessages = [...prevMessages];
+              newMessages[newMessages.length - 1] = {
+                ...newMessages[newMessages.length - 1],
+                content: fullResponse,
+              };
+              return newMessages;
+            });
+          }
+        } else {
+          const aiResponse = await sendMessage([...messages, userMessage], model);
+          const aiMessage: Message = { role: 'assistant', content: aiResponse };
+          setMessages(prevMessages => [...prevMessages, aiMessage]);
+        }
       } catch (error) {
         console.error('Error sending message:', error);
         const errorMessage: Message = { 
