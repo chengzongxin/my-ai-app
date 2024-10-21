@@ -20,6 +20,7 @@ export interface Message {
 
 export type ModelType = 'deepbricks' | 'gpt-proxy' | 'openai' | 'deepseek';
 
+// 确保 sendMessage 函数被导出
 export async function sendMessage(messages: Message[], model: ModelType = 'deepbricks') {
   let apiUrl: string;
   let apiKey: string;
@@ -120,5 +121,23 @@ export async function sendMessage(messages: Message[], model: ModelType = 'deepb
 
     const data = await response.json();
     return data.choices[0].message.content;
+  }
+}
+
+// 确保 getHotTopics 函数被导出
+export async function getHotTopics(model: ModelType = 'deepbricks'): Promise<string[]> {
+  const message: Message = { role: 'user', content: '请列出5个当前最热门的话题，每个话题不超过10个字，直接返回话题列表，不要有多余的文字，不要有序号。' };
+  const response = await sendMessage([message], model);
+  
+  if (typeof response === 'string') {
+    // 对于非流式响应
+    return response.split('\n').filter(topic => topic.trim() !== '');
+  } else {
+    // 对于流式响应
+    let fullResponse = '';
+    for await (const chunk of response) {
+      fullResponse += chunk;
+    }
+    return fullResponse.split('\n').filter(topic => topic.trim() !== '');
   }
 }

@@ -2,32 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { sendMessage, Message, ModelType } from '../utils/api';
-
-const allHotTopics = [
-  "你的AI模型是哪个版本",
-  "介绍一下人工智能",
-  "解释量子计算",
-  "如何学习编程",
-  "气候变化的影响",
-  "未来的工作趋势",
-  "区块链技术的应用",
-  "太空探索的最新进展",
-  "5G技术对社会的影响",
-  "机器学习在医疗领域的应用",
-  "可再生能源的发展前景",
-  "虚拟现实技术的未来",
-  "自动驾驶汽车的挑战",
-  "基因编辑技术的伦理问题",
-  "大数据在商业决策中的作用",
-  "人工智能在艺术创作中的应用"
-];
-
-const getRandomTopics = (count: number) => {
-  const firstTopic = allHotTopics[0]; // 始终包含第一个话题
-  const shuffled = [...allHotTopics.slice(1)].sort(() => 0.5 - Math.random());
-  return [firstTopic, ...shuffled.slice(0, count - 1)];
-};
+import { sendMessage, getHotTopics, Message, ModelType } from '../utils/api';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -38,8 +13,18 @@ const ChatInterface = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setHotTopics(getRandomTopics(5));
-  }, []);
+    const fetchHotTopics = async () => {
+      try {
+        const topics = await getHotTopics(model);
+        setHotTopics(topics);
+      } catch (error) {
+        console.error('Error fetching hot topics:', error);
+        setHotTopics(['获取热门话题失败']);
+      }
+    };
+
+    fetchHotTopics();
+  }, [model]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,27 +76,8 @@ const ChatInterface = () => {
     }
   };
 
-  const handleTopicClick = async (topic: string) => {
-    if (!isLoading) {
-      setIsLoading(true);
-      const userMessage: Message = { role: 'user', content: topic };
-      setMessages(prevMessages => [...prevMessages, userMessage]);
-
-      try {
-        const aiResponse = await sendMessage([...messages, userMessage], model);
-        const aiMessage: Message = { role: 'assistant', content: aiResponse };
-        setMessages(prevMessages => [...prevMessages, aiMessage]);
-      } catch (error) {
-        console.error('Error sending message:', error);
-        const errorMessage: Message = { 
-          role: 'assistant', 
-          content: `发生错误: ${error instanceof Error ? error.message : '未知错误'}`
-        };
-        setMessages(prevMessages => [...prevMessages, errorMessage]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  const handleTopicClick = (topic: string) => {
+    setInput(topic);
   };
 
   const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -143,7 +109,6 @@ const ChatInterface = () => {
                   key={index}
                   onClick={() => handleTopicClick(topic)}
                   className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm"
-                  disabled={isLoading}
                 >
                   {topic}
                 </button>
